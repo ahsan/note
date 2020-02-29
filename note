@@ -1,0 +1,66 @@
+#! /bin/bash
+
+[[ -n $DEBUG ]] && set -x
+
+set -eou pipefail
+
+readonly NOTES_DIR="./.notes"
+readonly LOGS_FILE="$NOTES_DIR/.log"
+readonly NEXT_ID_FILE="$NOTES_DIR/.next_id"
+
+main() {
+
+  # Initialize directory if it doesn't alread exist
+  if [[ ! -d "$NOTES_DIR" ]]; then
+    init
+  fi
+
+  add_note $1
+}
+
+init() {
+  mkdir -p "$NOTES_DIR"
+  
+  # start the log
+  local 
+  touch "$LOGS_FILE"
+  add_log "Initialized log file $LOGS_FILE"
+
+  # start the id count
+  touch "$NEXT_ID_FILE"
+  echo 0 > "$NEXT_ID_FILE"
+  add_log "Initialized next_id in the file $NEXT_ID_FILE with 0"
+}
+
+add_log() {
+  printf "$1\n" > "$LOGS_FILE"
+}
+
+get_next_id() {
+  echo $(cat "$NEXT_ID_FILE")
+}
+
+increment_next_id() {
+  local current_next_id=$(get_next_id)
+  local next_id=$((current_next_id + 1))
+  echo "$next_id" > "$NEXT_ID_FILE"
+  add_log "Incremented next id to $next_id"
+  echo "$next_id"
+}
+
+add_note() {
+  local book_name="$1"
+  local book_full_path="$NOTES_DIR/$book_name"
+  local note_id=$(get_next_id)
+  local note_full_path="$book_full_path/$note_id"
+
+  # Initialize book directory if it doesn't exist already
+  if [[ ! -d "$book_full_path" ]]; then
+    mkdir -p "$book_full_path"
+  fi
+
+  increment_next_id && touch "$note_full_path"
+  vi "$note_full_path"
+}
+
+main "$@"
