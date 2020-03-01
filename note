@@ -15,8 +15,18 @@ main() {
     init
   fi
 
-  # add_note $1
-  usage
+  # If there are less than 2 arguments, exit
+  if [ "$#" -lt 2 ]; then
+    usage
+    exit
+  fi
+
+  # Route arguments to functions
+  if [ "$1" = "add" ]; then
+    add_note $2
+  elif [ "$1" = "view" ]; then
+    view_note $2
+  fi
 }
 
 init() {
@@ -64,13 +74,21 @@ add_note() {
   vi "$note_full_path"
 }
 
+view_note() {
+  local note_id="$1"
+  local file_path=$(find "$NOTES_DIR" -name "$note_id" | awk 'NR==1{print $1}')
+  cat "$file_path"
+}
+
 usage() {
   local self="note"
 
   cat <<EOF
 Usage:
-$self             - print this help menu
-$self add <book>  - add a note in <book>
+$self                 print this help menu
+$self  add <book>     add a note in <book>
+$self view <note_id>  view note
+$self list <book>     list notes in <book>
 EOF
 }
 
