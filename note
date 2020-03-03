@@ -4,7 +4,7 @@
 
 set -eou pipefail
 
-readonly NOTES_DIR="./.notes"
+readonly NOTES_DIR="$(pwd)/.notes"
 readonly LOGS_FILE="$NOTES_DIR/.log"
 readonly NEXT_ID_FILE="$NOTES_DIR/.next_id"
 
