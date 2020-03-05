@@ -3,8 +3,9 @@
 [[ -n $DEBUG ]] && set -x
 
 set -eou pipefail
+echo "$(dirname $0)"
 
-readonly NOTES_DIR="$(pwd)/.notes"
+readonly NOTES_DIR="$(dirname $0)/.notes"
 readonly LOGS_FILE="$NOTES_DIR/.log"
 readonly NEXT_ID_FILE="$NOTES_DIR/.next_id"
 
@@ -46,7 +47,7 @@ init() {
 }
 
 add_log() {
-  printf "$1\n" > "$LOGS_FILE"
+  printf "$1\n" >> "$LOGS_FILE"
 }
 
 get_next_id() {
