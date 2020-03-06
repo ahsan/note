@@ -3,7 +3,6 @@
 [[ -n $DEBUG ]] && set -x
 
 set -eou pipefail
-echo "$(dirname $0)"
 
 readonly SCRIPT_DIR="$(dirname $0)"
 readonly NOTES_DIR=${NOTES_DIR:-"$(dirname $0)/.notes"}
@@ -22,19 +21,21 @@ main() {
     init_notes
   fi
 
-  # If there are less than 2 arguments, exit
-  if [ "$#" -lt 2 ]; then
+  if [ "$#" -lt 1 ]; then
     usage
     exit
-  fi
-
-  # Route arguments to functions
-  if [ "$1" = "add" ]; then
-    add_note $2
-  elif [ "$1" = "view" ]; then
-    view_note $2
-  elif [ "$1" = "list" ]; then
-    list_notes $2
+  elif [ "$#" -lt 2 ]; then
+    if [ "$1" = "list" ]; then
+      list_books
+    fi
+  else
+    if [ "$1" = "add" ]; then
+      add_note $2
+    elif [ "$1" = "view" ]; then
+      view_note $2
+    elif [ "$1" = "list" ]; then
+      list_notes $2
+    fi
   fi
 }
 
@@ -109,6 +110,15 @@ list_notes() {
     local first_line=$(head $file)
     echo "$file_name: $first_line"
   done
+}
+
+list_books() {
+  echo "List of books:"
+  pushd $NOTES_DIR > /dev/null
+  for f in *; do
+    echo $f;
+  done;
+  popd > /dev/null
 }
 
 usage() {
