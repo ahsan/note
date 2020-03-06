@@ -6,7 +6,7 @@ set -eou pipefail
 echo "$(dirname $0)"
 
 readonly SCRIPT_DIR="$(dirname $0)"
-readonly NOTES_DIR="$(dirname $0)/.notes"
+readonly NOTES_DIR=${NOTES_DIR:-"$(dirname $0)/.notes"}
 readonly LOGS_FILE="$SCRIPT_DIR/.log"
 readonly NEXT_ID_FILE="$SCRIPT_DIR/.next_id"
 
@@ -18,7 +18,7 @@ main() {
   fi
 
   # Initialize notes directory if it doesn't alread exist
-  if [[ ! -d "$NEXT_ID_FILE" ]]; then
+  if [[ ! -d "$NOTES_DIR" ]]; then
     init_notes
   fi
 
