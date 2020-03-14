@@ -107,7 +107,7 @@ list_notes() {
   for file in "$book_full_path"/*
   do
     local file_name=$(basename $file)
-    local first_line=$(head $file)
+    local first_line=$(head -n 1 $file)
     echo "$file_name: $first_line"
   done
 }
