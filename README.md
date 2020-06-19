@@ -6,7 +6,7 @@ Easily add new and read back old notes on the CLI.
 
 1. Clone repository locally.
 2. Make the `note` script executable and add its location to path.
-3. Create a repository to house all of your notes, e.g `~/.notes/`
+3. Create a new directory to house all of your notes, e.g `~/.notes/`
 ```
 mkdir ~/.notes/
 ```
