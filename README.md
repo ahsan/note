@@ -13,7 +13,7 @@ mkdir ~/.notes/
 4. Export the notes directory to your `bashrc` as `NOTES_DIR` environment variable.
 ```
 # .bashrc
-export NOTES_DIR=~/projects/note/.notes/
+export NOTES_DIR=~/.notes/
 ```
 
 ## Usage
