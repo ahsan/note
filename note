@@ -121,7 +121,7 @@ list_notes() {
 }
 
 list_books() {
-  echo "List of books:"
+  echo "List of notebooks:"
   pushd $NOTES_DIR > /dev/null
   for f in *; do
     echo $f;
