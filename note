@@ -27,6 +27,8 @@ main() {
   elif [ "$#" -lt 2 ]; then
     if [ "$1" = "list" ]; then
       list_books
+    elif [ "$1" = "find" ]; then
+      find_note
     fi
   else
     if [ "$1" = "add" ]; then
@@ -99,6 +101,16 @@ view_note() {
   cat "$file_path"
 }
 
+find_note() {
+  if ! command -v fzf &> /dev/null
+  then
+      echo "fzf not found. Please install it for interactive note search."
+      exit
+  fi
+  local file_path=$(find $NOTES_DIR/* -type f | fzf --preview 'cat {}' --preview-window=right:60%:rounded)
+  cat "$file_path"
+}
+
 edit_note() {
   local note_id="$1"
   local file_path=$(find "$NOTES_DIR" -name "$note_id" | awk 'NR==1{print $1}')
@@ -141,9 +153,10 @@ usage() {
 Usage:
 $self                 print this help menu
 $self  add <book>     add a note in <book>
+$self edit <note_id>  edit a note
+$self find            find a note interactively
 $self list <book>     list all notes in <book>
 $self view <note_id>  view note
-$self edit <note_id>  edit a note
 EOF
 }
 
