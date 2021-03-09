@@ -1,0 +1,84 @@
+#! /bin/bash
+
+[[ -n $DEBUG ]] && set -x
+
+set -eou pipefail
+
+readonly BKP_DIR="$NOTES_DIR.bkp"
+readonly V1_DIR="$NOTES_DIR.v1"
+readonly NOTE_NAME=note
+
+main() {
+
+  message
+
+  mkdir $BKP_DIR
+  log "Creating backup of $NOTES_DIR in $BKP_DIR"
+  cp -r $NOTES_DIR $BKP_DIR/
+  log "Backup done."
+  
+  log "Creating a new directory $V1_DIR"
+  mkdir -p $V1_DIR
+
+  pushd $NOTES_DIR > /dev/null
+  files=$(find . -type f -not -path "./.git/*")
+  num_files=$(echo "$files" | wc -l)
+  # num_files=$(echo ${files} | wc -l)
+  log "Found $num_files notes."
+
+  log "Now you will be prompted for tags for each note"
+  log "Make sure to enter tags in a comma-separated fashion without spaces"
+  read -p "Press enter to continue"
+
+  for f in $files; do
+    clear
+    
+    log $f
+    echo "=========================================="
+    cat $f
+    echo "=========================================="
+    echo "Enter csv tags for this note ⬆️"
+
+    read -p "< " tags
+    local tags="$tags,$(echo $f | cut -d "/" -f2)"
+    local tags_sorted=$(echo $tags | tr "," "\n" | sort)
+    local note_path=$V1_DIR/$(echo $tags_sorted | tr " " "/")/
+    local note_file="$note_path/$NOTE_NAME"
+    # echo $tags_sorted
+    echo $note_path
+
+    if [ ! -f $note_file ]; then
+      # create new note file
+      mkdir -p $note_path
+      touch $note_file
+    else 
+      echo "\n" >> $note_file
+    fi
+    cat $f >> $note_file
+
+    log "Updated $note_file ✅"
+    sleep 0.5
+
+  done;
+  
+  clear
+  log "Done!"
+}
+
+message() {
+  cat <<EOF
+===================================================================
+This script migrates your notes in \$NOTES_DIR from 'note' v0 to v1.
+
+Requirements:
+ - \$NOTES_DIR needs to be set correctly.
+===================================================================
+
+EOF
+}
+
+log() {
+  echo "> $1"
+}
+
+main "$@"
