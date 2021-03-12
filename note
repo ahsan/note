@@ -6,6 +6,7 @@ set -eou pipefail
 
 readonly SCRIPT_DIR="$(dirname $0)"
 readonly NOTES_DIR=${NOTES_DIR:-"$(dirname $0)/.notes"}
+readonly NOTE_NAME=note
 
 main() {
 
@@ -17,15 +18,13 @@ main() {
   if [ "$#" -lt 1 ]; then
     usage
     exit
-  elif [ "$#" -lt 2 ]; then
-    if [ "$1" = "find" ] || [ "$1" = "list" ]; then
-      find_note
-    fi
   else
-    if [ "$1" = "add" ]; then
-      add_note $2
+    if [ "$1" = "find" ] || [ "$1" = "list" ]; then
+        find_note
+    elif [ "$1" = "add" ]; then
+      add_note
     elif [ "$1" = "edit" ]; then
-      edit_note $2
+      edit_note
     fi
   fi
 }
@@ -34,22 +33,24 @@ init_notes() {
   mkdir -p "$NOTES_DIR"
 }
 
+temp_file() {
+  echo $(mktemp)
+}
+
+tags_string_to_dir() {
+  local tags_sorted=$(echo $1 | tr "," "\n" | sort)
+  local note_path=$NOTES_DIR/$(echo $tags_sorted | tr " " "/")/
+  echo $note_path
+}
+
 add_note() {
-  echo "Not implemented"
-  exit
-  local book_name="$1"
-  local book_full_path="$NOTES_DIR/$book_name"
-  local note_id=$(get_note_id)
-  local note_name="$(whoami)-$note_id"
-  local note_full_path="$book_full_path/$note_id"
-
-  # Initialize book directory if it doesn't exist already
-  if [[ ! -d "$book_full_path" ]]; then
-    mkdir -p "$book_full_path"
-  fi
-
-  increment_next_id && touch "$note_full_path"
-  vi "$note_full_path"
+  local output_temp_file=$(temp_file)
+  vim $output_temp_file
+  read -p "Enter comma separated tags for this note: " tags
+  local note_dir=$(tags_string_to_dir $tags)
+  local note_path=$note_dir/$NOTE_NAME
+  mkdir -p $note_dir
+  mv $output_temp_file $note_path
 }
 
 find_note() {
@@ -75,10 +76,10 @@ usage() {
 
   cat <<EOF
 Usage:
-$self                 print this help menu
-$self  add <book>     add a note in <book>
-$self edit <note_id>  edit a note
-$self find            find a note interactively
+$self          print this help menu
+$self   add    add a note
+$self  edit    find and edit a note
+$self  find    find a note interactively
 EOF
 }
 
