@@ -6,17 +6,10 @@ set -eou pipefail
 
 readonly SCRIPT_DIR="$(dirname $0)"
 readonly NOTES_DIR=${NOTES_DIR:-"$(dirname $0)/.notes"}
-readonly LOGS_FILE="$SCRIPT_DIR/.log"
-readonly NEXT_ID_FILE="$SCRIPT_DIR/.next_id"
 
 main() {
 
-  # Initialize 
-  if [[ ! -f "$NEXT_ID_FILE" ]]; then
-    init
-  fi
-
-  # Initialize notes directory if it doesn't alread exist
+  # Initialize notes directory if it doesn't already exist
   if [[ ! -d "$NOTES_DIR" ]]; then
     init_notes
   fi
@@ -39,38 +32,6 @@ main() {
 
 init_notes() {
   mkdir -p "$NOTES_DIR"
-}
-
-init() {
-  # start the log
-  local 
-  touch "$LOGS_FILE"
-  add_log "Initialized log file $LOGS_FILE"
-
-  # start the id count
-  touch "$NEXT_ID_FILE"
-  echo 0 > "$NEXT_ID_FILE"
-  add_log "Initialized next_id in the file $NEXT_ID_FILE with 0"
-}
-
-add_log() {
-  printf "$1\n" >> "$LOGS_FILE"
-}
-
-get_next_id() {
-  echo $(cat "$NEXT_ID_FILE")
-}
-
-increment_next_id() {
-  local current_next_id=$(get_next_id)
-  local next_id=$((current_next_id + 1))
-  echo "$next_id" > "$NEXT_ID_FILE"
-  add_log "Incremented next id to $next_id"
-  echo "$next_id"
-}
-
-get_note_id() {
-  echo "$(whoami)-$(get_next_id)"
 }
 
 add_note() {
