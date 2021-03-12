@@ -28,6 +28,8 @@ main() {
     view_note
   elif [ "$1" = "edit" ]; then
     edit_note
+  elif [ "$1" = "del" ] || [ "$1" = "delete" ]; then
+    delete_note
   else
     usage
   fi
@@ -79,6 +81,12 @@ edit_note() {
   vim $note_path
 }
 
+delete_note() {
+  local note_path=$(find_note)
+  rm "$note_path"
+  find "$NOTES_DIR/" -type d -not -path '*/\.*' -empty -delete
+}
+
 usage() {
   local self="note"
 
@@ -89,6 +97,7 @@ $self   add    add a note
 $self  view    find and view note in less
 $self  edit    find and edit note in vim
 $self  find    find a note interactively
+$self   del    find and delete a note
 EOF
 }
 
