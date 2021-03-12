@@ -25,9 +25,7 @@ main() {
     usage
     exit
   elif [ "$#" -lt 2 ]; then
-    if [ "$1" = "list" ]; then
-      list_books
-    elif [ "$1" = "find" ]; then
+    if [ "$1" = "find" ] || [ "$1" = "list" ]; then
       find_note
     fi
   else
@@ -35,8 +33,6 @@ main() {
       add_note $2
     elif [ "$1" = "view" ]; then
       view_note $2
-    elif [ "$1" = "list" ]; then
-      list_notes $2
     elif [ "$1" = "edit" ]; then
       edit_note $2
     fi
@@ -107,7 +103,7 @@ find_note() {
       echo "fzf not found. Please install it for interactive note search."
       exit
   fi
-  local file_path=$(find $NOTES_DIR/* -type f | fzf --preview 'cat {}' --preview-window=right:60%:rounded)
+  local file_path=$(find $NOTES_DIR/* -type f | fzf -e --preview 'cat {}' --preview-window=right:60%:rounded)
   cat "$file_path"
 }
 
@@ -115,35 +111,6 @@ edit_note() {
   local note_id="$1"
   local file_path=$(find "$NOTES_DIR" -name "$note_id" | awk 'NR==1{print $1}')
   vim "$file_path"
-}
-
-list_notes() {
-  local book_name="$1"
-  local book_full_path="$NOTES_DIR/$book_name"
-  # local file_names=$(ls "$book_full_path" | sort)
-  # echo $file_names
-
-  local output_temp_file="$(mktemp)"
-
-  echo "ID:TITLE" > $output_temp_file
-  # echo "Notes in $book_name:"
-  for file in "$book_full_path"/*
-  do
-    local file_name=$(basename $file)
-    local first_line=$(head -n 1 $file)
-    echo "$file_name:$first_line" >> $output_temp_file
-  done
-
-  column -s: -t $output_temp_file
-}
-
-list_books() {
-  echo "NOTEBOOKS"
-  pushd $NOTES_DIR > /dev/null
-  for f in *; do
-    echo $f;
-  done;
-  popd > /dev/null
 }
 
 usage() {
@@ -155,7 +122,6 @@ $self                 print this help menu
 $self  add <book>     add a note in <book>
 $self edit <note_id>  edit a note
 $self find            find a note interactively
-$self list <book>     list all notes in <book>
 $self view <note_id>  view note
 EOF
 }
