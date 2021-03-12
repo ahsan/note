@@ -18,15 +18,21 @@ main() {
   if [ "$#" -lt 1 ]; then
     usage
     exit
-  else
-    if [ "$1" = "find" ] || [ "$1" = "list" ]; then
-        find_note
-    elif [ "$1" = "add" ]; then
-      add_note
-    elif [ "$1" = "edit" ]; then
-      edit_note
-    fi
   fi
+  
+  if [ "$1" = "find" ] || [ "$1" = "list" ]; then
+      find_note
+  elif [ "$1" = "add" ]; then
+    add_note
+  elif [ "$1" = "view" ]; then
+    view_note
+  elif [ "$1" = "edit" ]; then
+    edit_note
+  else
+    usage
+  fi
+
+  exit
 }
 
 init_notes() {
@@ -60,15 +66,17 @@ find_note() {
       exit
   fi
   local file_path=$(find $NOTES_DIR/* -type f | fzf -e --preview 'cat {}' --preview-window=right:60%:rounded)
-  cat "$file_path"
+  echo "$file_path"
+}
+
+view_note() {
+  local note_path=$(find_note)
+  less $note_path
 }
 
 edit_note() {
-  echo "Not implemented"
-  exit
-  local note_id="$1"
-  local file_path=$(find "$NOTES_DIR" -name "$note_id" | awk 'NR==1{print $1}')
-  vim "$file_path"
+  local note_path=$(find_note)
+  vim $note_path
 }
 
 usage() {
@@ -78,7 +86,8 @@ usage() {
 Usage:
 $self          print this help menu
 $self   add    add a note
-$self  edit    find and edit a note
+$self  view    find and view note in less
+$self  edit    find and edit note in vim
 $self  find    find a note interactively
 EOF
 }
