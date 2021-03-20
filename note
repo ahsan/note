@@ -53,12 +53,13 @@ tags_string_to_dir() {
 
 add_note() {
   local output_temp_file=$(temp_file)
-  vim $output_temp_file
+  vim -c 'startinsert' $output_temp_file
   read -p "Enter comma separated tags for this note: " tags
   local note_dir=$(tags_string_to_dir $tags)
   local note_path=$note_dir/$NOTE_NAME
   mkdir -p $note_dir
-  mv $output_temp_file $note_path
+  touch $note_path
+  cat $output_temp_file >> $note_path 
 }
 
 find_note() {
