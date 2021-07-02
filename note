@@ -21,7 +21,7 @@ main() {
   fi
   
   if [ "$1" = "find" ] || [ "$1" = "list" ]; then
-      find_note
+    find_note
   elif [ "$1" = "add" ]; then
     add_note
   elif [ "$1" = "view" ]; then
