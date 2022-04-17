@@ -68,7 +68,7 @@ find_note() {
       echo "fzf not found. Please install it for interactive note search."
       exit
   fi
-  local file_path=$(find $NOTES_DIR/* -type f | fzf -e --preview 'cat {}' --preview-window=right:60%:rounded)
+  local file_path=$(find $NOTES_DIR/* -type f | fzf -e --preview 'cat {}' --preview-window=right:60%)
   echo "$file_path"
 }
 
